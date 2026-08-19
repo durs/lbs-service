@@ -6,7 +6,7 @@ The service reads a pre-built binary index file (`.idx`) at startup — it does 
 
 ## Features
 
-- Lookup coordinates by cell tower identifiers (MCC, MNC, LAC, CID)
+- Lookup coordinates by cell tower identifiers {MCC, MNC, LAC, CID} or "MCC:MNC:LAC:CID" or "PLMN:LAC:CID"
 - Multi-cell weighted average location
 - Streaming index builder for large OpenCellID CSV files
 - Low-memory runtime: binary search on disk-backed index
@@ -71,6 +71,10 @@ BUILD_CHUNK_RECORDS=100000
 
 ```bash
 curl "http://localhost:3000/locate?mcc=260&mnc=2&lac=45080&cid=21728&detail"
+```
+
+```bash
+curl "http://localhost:3000/locate?cell=26002:45080:21728&detail"
 ```
 
 ```bash

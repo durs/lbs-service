@@ -10,20 +10,30 @@ function parseRequiredInt(value, name) {
   return parsed;
 }
 
-function parseLbsFromQuery(query) {
+function parseLbsFromString(str) {
+  const parts = str.split(':');
+  if (parts.length < 3) {
+    throw new Error(`Invalid cell info`);
+  }
+  let mcc, mnc, ofs;
+  if (parts.length < 4) {
+    mcc = parts[0].substring(0, 3);
+    mnc = parts[0].substring(3);
+    ofs = 0;
+  } else {
+    mcc = parts[0];
+    mnc = parts[1];
+    ofs = 1;
+  }
   return {
-    mcc: parseRequiredInt(query.mcc, 'mcc'),
-    mnc: parseRequiredInt(query.mnc, 'mnc'),
-    lac: parseRequiredInt(query.lac ?? query.tac, 'lac/tac'),
-    cid: parseRequiredInt(query.cid ?? query.cellid ?? query.cell, 'cid/cellid'),
+    mcc: parseRequiredInt(mcc, 'mcc'),
+    mnc: parseRequiredInt(mnc, 'mnc'),
+    lac: parseRequiredInt(parts[ofs + 1], 'lac/tac'),
+    cid: parseRequiredInt(parts[ofs + 2], 'cid/cellid'),
   };
 }
 
-function parseLbsFromBody(body) {
-  if (!body || typeof body !== 'object') {
-    throw new Error('Request body must be a JSON object');
-  }
-
+function parseLbsFromObject(body) {
   return {
     mcc: parseRequiredInt(body.mcc, 'mcc'),
     mnc: parseRequiredInt(body.mnc, 'mnc'),
@@ -32,13 +42,23 @@ function parseLbsFromBody(body) {
   };
 }
 
+function parseLbsFromQuery(query) {
+  if (typeof query.cell === 'string') {
+      return parseLbsFromString(query.cell);
+  }
+  return parseLbsFromObject(query);
+}
+
 function parseCellsFromBody(body) {
   if (!body || typeof body !== 'object') {
     throw new Error('Request body must be a JSON object');
   }
 
   if (!Array.isArray(body.cells)) {
-    return [parseLbsFromBody(body)];
+    if (typeof body.cell === 'string') {
+      return parseLbsFromString(body.cell);
+    }
+    return [parseLbsFromObject(body)];
   }
 
   if (body.cells.length === 0) {
@@ -47,7 +67,13 @@ function parseCellsFromBody(body) {
 
   return body.cells.map((cell, index) => {
     try {
-      return parseLbsFromBody(cell);
+      if (typeof cell === 'string') {
+        return parseLbsFromString(cell);
+      }
+      if (typeof cell !== 'object') {
+        throw new Error('Cell must be a JSON object or string');
+      }
+      return parseLbsFromObject(cell);
     } catch (error) {
       throw new Error(`cells[${index}]: ${error.message}`);
     }
