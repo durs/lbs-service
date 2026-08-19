@@ -148,21 +148,3 @@ Cell tower data from [OpenCellID](https://opencellid.org/) is licensed under [CC
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-## Publish to GitHub
-
-```bash
-git add .
-git commit -m "Initial commit: OpenCellID LBS service"
-gh repo create opencellid-lbs-service --public --source=. --remote=origin --push
-```
-
-Without GitHub CLI, create a repository on GitHub, then:
-
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/opencellid-lbs-service.git
-git branch -M main
-git push -u origin main
-```
-
-After creating the repo, update the `repository` field in `package.json` with your GitHub URL.

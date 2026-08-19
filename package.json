@@ -1,5 +1,5 @@
 {
-  "name": "opencellid-lbs-service",
+  "name": "lbs-service",
   "version": "1.0.0",
   "description": "HTTP service for cell tower coordinate lookup from OpenCellID CSV data",
   "main": "src/server.js",
@@ -25,12 +25,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YOUR_USERNAME/opencellid-lbs-service.git"
+    "url": "git+https://github.com/durs/lbs-service.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/opencellid-lbs-service/issues"
+    "url": "https://github.com/durs/lbs-service/issues"
   },
-  "homepage": "https://github.com/YOUR_USERNAME/opencellid-lbs-service#readme",
+  "homepage": "https://github.com/durs/lbs-service#readme",
   "dependencies": {
     "csv-parse": "^5.6.0",
     "dotenv": "^16.4.7",
