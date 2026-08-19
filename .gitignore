@@ -1,0 +1,24 @@
+node_modules/
+.env
+*.log
+npm-debug.log*
+
+# Index build temp files
+*.unsorted.tmp
+*.sorted.tmp
+.sort-*.tmp/
+
+# Large data files (download/build locally)
+*.csv
+*.csv.gz
+!data/sample_cell_towers.csv
+
+# Generated indexes (except sample for quick start)
+*.idx
+!data/sample_cell_towers.idx
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

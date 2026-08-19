@@ -1,0 +1,22 @@
+services:
+  lbs:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      INDEX_PATH: ${INDEX_PATH:-/app/data/sample_cell_towers.idx}
+    volumes:
+      - ./data:/data:ro
+    restart: unless-stopped
+
+  build-index:
+    build: .
+    profiles:
+      - tools
+    environment:
+      BUILD_CHUNK_RECORDS: ${BUILD_CHUNK_RECORDS:-250000}
+    volumes:
+      - ./data:/data
+    entrypoint: ["node", "src/buildIndex.js"]
+    command: ["/data/cell_towers.csv", "/data/cell_towers.idx"]
