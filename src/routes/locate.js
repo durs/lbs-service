@@ -33,8 +33,12 @@ function parseLbsFromBody(body) {
 }
 
 function parseCellsFromBody(body) {
-  if (!body || !Array.isArray(body.cells)) {
-    throw new Error('Request body must contain a "cells" array');
+  if (!body || typeof body !== 'object') {
+    throw new Error('Request body must be a JSON object');
+  }
+
+  if (!Array.isArray(body.cells)) {
+    return [parseLbsFromBody(body)];
   }
 
   if (body.cells.length === 0) {
@@ -55,25 +59,29 @@ export function createLocateRouter(store) {
 
   router.get('/', (req, res) => {
     try {
-      const lbs = parseLbsFromQuery(req.query);
+      const query = req.query;
+      const lbs = parseLbsFromQuery(query);
       const tower = store.lookup(lbs);
 
       if (!tower) {
         return res.status(404).json({
           error: 'Cell tower not found',
-          query: lbs,
         });
       }
 
-      return res.json({
-        query: lbs,
+      const answer = {
         location: {
           lat: tower.lat,
           lon: tower.lon,
-          accuracyMeters: tower.range,
+          accuracy: tower.range,
         },
-        tower,
-      });
+      };
+      if (+query.detail || query.detail === '') {
+        answer.method = 'single-cell';
+        answer.towers = [tower];
+      }
+
+      return res.json(answer);
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
@@ -81,53 +89,29 @@ export function createLocateRouter(store) {
 
   router.post('/', (req, res) => {
     try {
-      const lbs = parseLbsFromBody(req.body);
-      const tower = store.lookup(lbs);
-
-      if (!tower) {
-        return res.status(404).json({
-          error: 'Cell tower not found',
-          query: lbs,
-        });
-      }
-
-      return res.json({
-        query: lbs,
-        location: {
-          lat: tower.lat,
-          lon: tower.lon,
-          accuracyMeters: tower.range,
-        },
-        tower,
-      });
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
-    }
-  });
-
-  router.post('/multilaterate', (req, res) => {
-    try {
-      const cells = parseCellsFromBody(req.body);
+      const body = req.body;
+      const cells = parseCellsFromBody(body);
       const result = store.locateMultiple(cells);
 
       if (!result) {
         return res.status(404).json({
           error: 'No matching cell towers found',
-          query: { cells },
         });
       }
 
-      return res.json({
-        query: { cells },
+      const answer = {
         location: {
           lat: result.lat,
           lon: result.lon,
-          accuracyMeters: result.accuracyMeters,
+          accuracy: result.accuracy,
         },
-        matchedCells: result.matchedCells,
-        method: result.method,
-        towers: result.towers,
-      });
+      }
+      if (+body.detail) {
+        answer.method = result.method;
+        answer.towers = result.towers;
+      }
+
+      return res.json(answer);
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }

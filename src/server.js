@@ -61,9 +61,9 @@ function start() {
   app.listen(port, () => {
     console.log(`OpenCellID LBS service listening on http://localhost:${port}`);
     console.log('Examples:');
-    console.log(`  GET  http://localhost:${port}/locate?mcc=260&mnc=2&lac=45080&cid=21728`);
-    console.log(`  POST http://localhost:${port}/locate`);
-    console.log(`  POST http://localhost:${port}/locate/multilaterate`);
+    console.log(`  GET  http://localhost:${port}/locate?mcc=260&mnc=2&lac=45080&cid=21728&detail`);
+    console.log(`  POST http://localhost:${port}/locate JSON {mcc,mnc,lac,cid,detail}`);
+    console.log(`  POST http://localhost:${port}/locate JSON {cells:[{mcc,mnc,lac,cid}],detail}`);
   });
 }
 

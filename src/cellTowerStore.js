@@ -124,8 +124,7 @@ export class CellTowerStore {
       return {
         lat: matches[0].lat,
         lon: matches[0].lon,
-        accuracyMeters: matches[0].range,
-        matchedCells: 1,
+        accuracy: matches[0].range,
         method: 'single-cell',
         towers: matches,
       };
@@ -150,8 +149,7 @@ export class CellTowerStore {
     return {
       lat: weightedLat / totalWeight,
       lon: weightedLon / totalWeight,
-      accuracyMeters: minRange,
-      matchedCells: matches.length,
+      accuracy: minRange,
       method: 'weighted-average',
       towers: matches,
     };

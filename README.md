@@ -7,7 +7,7 @@ The service reads a pre-built binary index file (`.idx`) at startup — it does 
 ## Features
 
 - Lookup coordinates by cell tower identifiers (MCC, MNC, LAC, CID)
-- Multi-cell weighted average location (`/locate/multilaterate`)
+- Multi-cell weighted average location
 - Streaming index builder for large OpenCellID CSV files
 - Low-memory runtime: binary search on disk-backed index
 - Docker support
@@ -63,35 +63,53 @@ BUILD_CHUNK_RECORDS=100000
 |--------|----------|-------------|
 | `GET` | `/health` | Service health and index stats |
 | `GET` | `/stats` | Index file stats |
-| `GET` | `/locate?mcc=&mnc=&lac=&cid=` | Single-cell lookup |
-| `POST` | `/locate` | Single-cell lookup (JSON body) |
-| `POST` | `/locate/multilaterate` | Multi-cell weighted average |
+| `GET` | `/locate?mcc=&mnc=&lac=&cid=&detail` | Single-cell lookup |
+| `POST` | `/locate` | Single-cell lookup (JSON body {mcc,mnc,lac,cid,detail}) |
+| `POST` | `/locate` | Multi-cell weighted average (JSON body {cells:[{mcc,mnc,lac,cid}],detail}) |
 
 ### Single cell
 
 ```bash
-curl "http://localhost:3000/locate?mcc=260&mnc=2&lac=45080&cid=21728"
+curl "http://localhost:3000/locate?mcc=260&mnc=2&lac=45080&cid=21728&detail"
+```
+
+```bash
+curl -X POST http://localhost:3000/locate \
+  -H "Content-Type: application/json" \
+  -d '{ "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728, "detail": true }'
 ```
 
 ```json
 {
-  "query": { "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728 },
-  "location": { "lat": 52.275505, "lon": 21.016382, "accuracyMeters": 123 },
-  "tower": { "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728, "lat": 52.275505, "lon": 21.016382, "range": 123, "samples": 2 }
+  "location": { "lat": 52.275505, "lon": 21.016382, "accuracy": 123 },
+  "method": "single-cell",
+  "towers": [{ "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728, "lat": 52.275505, "lon": 21.016382, "range": 123, "samples": 2 }]
 }
 ```
 
 ### Multiple cells
 
 ```bash
-curl -X POST http://localhost:3000/locate/multilaterate \
+curl -X POST http://localhost:3000/locate \
   -H "Content-Type: application/json" \
   -d '{
+    "detail": true,
     "cells": [
       { "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728 },
       { "mcc": 260, "mnc": 2, "lac": 58140, "cid": 42042781 }
     ]
   }'
+```
+
+```json
+{
+  "location": { "lat": 52.27551, "lon": 21.016387, "accuracy": 120 },
+  "method": "weighted-average",
+  "towers": [
+    { "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728, "lat": 52.275505, "lon": 21.016382, "range": 123, "samples": 2 },
+    { "mcc": 260, "mnc": 2, "lac": 58140, "cid": 42042781, "lat": 52.275515, "lon": 21.016392, "range": 120, "samples": 1 }
+  ]
+}
 ```
 
 LAC/TAC and CID accept aliases: `tac`, `cellid`, `cell`.
@@ -148,3 +166,8 @@ Cell tower data from [OpenCellID](https://opencellid.org/) is licensed under [CC
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+# Contributors
+
+* [Yuri Dursin](https://github.com/durs)
+* [Composer 2.5 Fast](https://cursor.com/composer)
