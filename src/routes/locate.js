@@ -90,13 +90,13 @@ export function createLocateRouter(store) {
       const tower = store.lookup(lbs);
 
       if (!tower) {
-        return res.status(404).json({
+        return res.status(200).json({
           error: 'Cell tower not found',
         });
       }
 
       const answer = {
-        location: {
+        position: {
           lat: tower.lat,
           lon: tower.lon,
           accuracy: tower.range,
@@ -109,7 +109,7 @@ export function createLocateRouter(store) {
 
       return res.json(answer);
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(200).json({ error: error.message });
     }
   });
 
@@ -126,7 +126,7 @@ export function createLocateRouter(store) {
       }
 
       const answer = {
-        location: {
+        position: {
           lat: result.lat,
           lon: result.lon,
           accuracy: result.accuracy,

@@ -85,7 +85,7 @@ curl -X POST http://localhost:3000/locate \
 
 ```json
 {
-  "location": { "lat": 52.275505, "lon": 21.016382, "accuracy": 123 },
+  "position": { "lat": 52.275505, "lon": 21.016382, "accuracy": 123 },
   "method": "single-cell",
   "towers": [{ "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728, "lat": 52.275505, "lon": 21.016382, "range": 123, "samples": 2 }]
 }
@@ -107,7 +107,7 @@ curl -X POST http://localhost:3000/locate \
 
 ```json
 {
-  "location": { "lat": 52.27551, "lon": 21.016387, "accuracy": 120 },
+  "position": { "lat": 52.27551, "lon": 21.016387, "accuracy": 120 },
   "method": "weighted-average",
   "towers": [
     { "mcc": 260, "mnc": 2, "lac": 45080, "cid": 21728, "lat": 52.275505, "lon": 21.016382, "range": 123, "samples": 2 },
